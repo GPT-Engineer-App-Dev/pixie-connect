@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { v4 as uuidv4 } from "uuid";
+import { Heart } from "lucide-react"; // Import Heart icon
 
 const dummyPosts = [
   {
@@ -11,12 +12,14 @@ const dummyPosts = [
     username: "john_doe",
     caption: "Beautiful sunset!",
     imageUrl: "https://via.placeholder.com/300",
+    likes: 0, // Add likes property
   },
   {
     id: uuidv4(),
     username: "jane_smith",
     caption: "Loving the new camera!",
     imageUrl: "https://via.placeholder.com/300",
+    likes: 0, // Add likes property
   },
 ];
 
@@ -44,10 +47,14 @@ const Index = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newPost.username && newPost.caption && selectedFile) {
-      setPosts([{ id: uuidv4(), ...newPost, imageUrl: selectedFile }, ...posts]);
+      setPosts([{ id: uuidv4(), ...newPost, imageUrl: selectedFile, likes: 0 }, ...posts]);
       setNewPost({ username: "", caption: "", imageUrl: "" });
       setSelectedFile(null);
     }
+  };
+
+  const handleLike = (postId) => {
+    setPosts(posts.map(post => post.id === postId ? { ...post, likes: post.likes + 1 } : post));
   };
 
   return (
@@ -81,6 +88,12 @@ const Index = () => {
             <CardContent>
               <img src={post.imageUrl} alt={post.caption} className="w-full h-auto" />
               <p>{post.caption}</p>
+              <div className="flex items-center space-x-2 mt-2">
+                <Button variant="ghost" size="sm" onClick={() => handleLike(post.id)}>
+                  <Heart className="h-5 w-5 text-red-500" />
+                  <span className="ml-2">{post.likes}</span>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
