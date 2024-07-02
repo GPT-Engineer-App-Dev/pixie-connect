@@ -23,17 +23,30 @@ const dummyPosts = [
 const Index = () => {
   const [posts, setPosts] = useState(dummyPosts);
   const [newPost, setNewPost] = useState({ username: "", caption: "", imageUrl: "" });
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewPost({ ...newPost, [name]: value });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedFile(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newPost.username && newPost.caption && newPost.imageUrl) {
-      setPosts([{ id: uuidv4(), ...newPost }, ...posts]);
+    if (newPost.username && newPost.caption && selectedFile) {
+      setPosts([{ id: uuidv4(), ...newPost, imageUrl: selectedFile }, ...posts]);
       setNewPost({ username: "", caption: "", imageUrl: "" });
+      setSelectedFile(null);
     }
   };
 
@@ -53,10 +66,9 @@ const Index = () => {
           onChange={handleInputChange}
         />
         <Input
-          name="imageUrl"
-          placeholder="Image URL"
-          value={newPost.imageUrl}
-          onChange={handleInputChange}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
         />
         <Button type="submit">Share Photo</Button>
       </form>
